@@ -5,20 +5,12 @@
 
 
 ## Installation
-1. Create React project
-```cmd
-npm create vite@latest
-```
-2.  Install React project
-```cmd
+1.  Install React project
+```cookie
 npm install
 ```
-3. install dependencies
-```cmd
-npm install ol proj4
-```
-4. Run project
-```cmd
+2. Run project
+```cookie
 npm run dev
 ```
 
