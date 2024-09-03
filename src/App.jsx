@@ -131,6 +131,7 @@ const App = () => {
             mapProjection,
             imageProjection,
             (point) => {
+                console.log("test")
                 return TPS.applyTPSTransformation(coeffs, mapPoints, point)
             },
             (coords) => coords
