@@ -18,7 +18,7 @@ import Style from "ol/style/Style";
 import CircleStyle from "ol/style/Circle";
 import Fill from "ol/style/Fill";
 import "./App.css";
-import imageUrl from './assets/map_clipped.png';
+import imageUrl from "./assets/map_clipped.png";
 
 const App = () => {
     const [mainMap, setMainMap] = useState(null);
@@ -30,12 +30,13 @@ const App = () => {
 
     const imageSource = imageUrl;
 
+    const scale = 10;
     useEffect(() => {
         const img = new Image();
         img.src = imageUrl;
         img.onload = () => {
-            const width = img.width;
-            const height = img.height;
+            const width = img.width * scale;
+            const height = img.height * scale;
             setImageExtent([0, 0, width, height]);
         };
     }, [imageSource]);
@@ -50,7 +51,7 @@ const App = () => {
         const mapProj = getProjection("EPSG:3857");
         const imgProj = new Projection({
             code: "georef-image",
-            units: "degrees",
+            units: "m",
         });
 
         setMapProjection(mapProj);
@@ -86,7 +87,7 @@ const App = () => {
                     image: new CircleStyle({
                         radius: 5,
                         fill: new Fill({
-                            color: '#FF0000',
+                            color: "#FF0000",
                         }),
                     }),
                 }),
@@ -106,17 +107,17 @@ const App = () => {
 
     const handleChanged = () => {
         const mapPoints = [
-            [ -8370429.490654901, 4867651.87361489 ],
-            [ -8370615.538426359, 4869320.508890055 ],
-            [ -8368083.461977787, 4869558.814898979 ],
-            [ -8368232.9709453685, 4867723.240033842 ]
+            [-8370429.490654901, 4867651.87361489],
+            [-8370615.538426359, 4869320.508890055],
+            [-8368083.461977787, 4869558.814898979],
+            [-8368232.9709453685, 4867723.240033842],
         ];
         const imagePoints = [
-            [ 107.12444972569087, 9.280707359384778 ],
-            [ 57.2517490433864 + addNumber, 504.26537432548855 ],
-            [ 806.0133025747704, 574.7787658121335 ],
-            [ 761.0608751969928, 30.782732147959823 ]
-        ];
+            [107.12444972569087, 9.280707359384778],
+            [57.2517490433864 + addNumber, 504.26537432548855],
+            [806.0133025747704, 574.7787658121335],
+            [761.0608751969928, 30.782732147959823],
+        ].map((c) => [c[0] * scale, c[1] * scale]);
         addImage(imageSource, imageExtent, mapPoints, imagePoints);
 
         addPointsToMap(mapPoints);
@@ -124,22 +125,20 @@ const App = () => {
 
     const addImage = (source, extent, mapPoints, imagePoints) => {
         imageProjection.setExtent(extent);
-
         const coeffs = TPS.computeTPSCoefficients(mapPoints, imagePoints);
-
         addCoordinateTransforms(
             mapProjection,
             imageProjection,
             (point) => {
-                console.log("test")
-                return TPS.applyTPSTransformation(coeffs, mapPoints, point)
+                // console.log("add");
+                return TPS.applyTPSTransformation(coeffs, mapPoints, point);
             },
             (coords) => coords
         );
 
         imageLayer.setSource(
             new Static({
-                attributions: '',
+                attributions: "",
                 url: source,
                 projection: imageProjection,
                 imageExtent: extent,
@@ -149,9 +148,13 @@ const App = () => {
     };
 
     const addPointsToMap = (mapPoints) => {
-        const vectorSource = mainMap.getLayers().getArray().find(layer => layer instanceof VectorLayer).getSource();
+        const vectorSource = mainMap
+            .getLayers()
+            .getArray()
+            .find((layer) => layer instanceof VectorLayer)
+            .getSource();
 
-        mapPoints.forEach(point => {
+        mapPoints.forEach((point) => {
             const feature = new Feature({
                 geometry: new Point(point),
             });
